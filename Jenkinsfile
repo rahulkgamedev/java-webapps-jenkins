@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.9.9-eclipse-temurin-21'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
 
     stages {
 
@@ -15,17 +10,19 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build with Maven (Docker)') {
             steps {
                 sh '''
-                  java -version
-                  mvn -version
-                  mvn clean package
+                  docker run --rm \
+                    -v "$PWD":/app \
+                    -w /app \
+                    maven:3.9.9-eclipse-temurin-21 \
+                    mvn clean package
                 '''
             }
         }
 
-        stage('Docker Build & Deploy') {
+        stage('Docker Build & Run') {
             steps {
                 sh '''
                   docker stop java-webapp || true
@@ -40,12 +37,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ Java Web Application deployed successfully (Docker-based build)'
+            echo '✅ Java Web Application deployed successfully'
         }
         failure {
             echo '❌ Pipeline failed'
         }
     }
 }
-
-

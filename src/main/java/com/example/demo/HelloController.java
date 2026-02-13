@@ -8,6 +8,7 @@ public class HelloController {
 
     @GetMapping("/")
     public String hello() {
-        return "🚀 Java Web App deployed using Jenkins CI/CD + Docker!";
+        return "this is reshma's small java application";
     }
 }
+

@@ -1,15 +1,12 @@
-# Use lightweight JRE image (not full JDK)
-FROM eclipse-temurin:17-jre
-
-# Create app directory
+# ---- Build Stage ----
+FROM maven:3.9.9-eclipse-temurin-17 AS build
 WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
 
-# Copy the generated jar file
-COPY target/*.jar app.jar
-
-# Expose application port
+# ---- Runtime Stage ----
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8082
-
-# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
-
